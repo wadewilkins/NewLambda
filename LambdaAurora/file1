@@ -1,0 +1,262 @@
+{
+    "DBClusters": [
+        {
+            "MasterUsername": "ankumar", 
+            "ReaderEndpoint": "aktest.cluster-ro-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "ReadReplicaIdentifiers": [], 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-aa7e69d2"
+                }
+            ], 
+            "HostedZoneId": "Z1PVIF0B656C1W", 
+            "Status": "available", 
+            "MultiAZ": true, 
+            "LatestRestorableTime": "2019-03-22T18:43:23.767Z", 
+            "PreferredBackupWindow": "06:27-06:57", 
+            "DBSubnetGroup": "default-vpc-e5588581", 
+            "AllocatedStorage": 1, 
+            "BackupRetentionPeriod": 1, 
+            "PreferredMaintenanceWindow": "sun:11:21-sun:11:51", 
+            "Engine": "aurora", 
+            "Endpoint": "aktest.cluster-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "AssociatedRoles": [], 
+            "EarliestRestorableTime": "2019-03-21T06:31:17.217Z", 
+            "IAMDatabaseAuthenticationEnabled": false, 
+            "ClusterCreateTime": "2017-09-14T20:27:00.251Z", 
+            "EngineVersion": "5.6.10a", 
+            "DBClusterIdentifier": "aktest", 
+            "DbClusterResourceId": "cluster-TZIH7AUC6C4QXSIVGFHWWRQTPY", 
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": false, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 0, 
+                    "DBInstanceIdentifier": "aktest"
+                }, 
+                {
+                    "IsClusterWriter": true, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 0, 
+                    "DBInstanceIdentifier": "aktest-us-west-2b"
+                }
+            ], 
+            "DBClusterArn": "arn:aws:rds:us-west-2:129801715103:cluster:aktest", 
+            "KmsKeyId": "arn:aws:kms:us-west-2:129801715103:key/032f30ab-8e53-48f3-b7bf-11c88cc18056", 
+            "StorageEncrypted": true, 
+            "DatabaseName": "akdemo", 
+            "DBClusterParameterGroup": "aurora-test", 
+            "AvailabilityZones": [
+                "us-west-2c", 
+                "us-west-2a", 
+                "us-west-2b"
+            ], 
+            "Port": 3306
+        }, 
+        {
+            "MasterUsername": "pdba", 
+            "ReaderEndpoint": "auroratest-dbcluster-1jzpu7c9593ol.cluster-ro-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "ReadReplicaIdentifiers": [], 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-5a575420"
+                }, 
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-aa7e69d2"
+                }
+            ], 
+            "HostedZoneId": "Z1PVIF0B656C1W", 
+            "Status": "available", 
+            "MultiAZ": true, 
+            "LatestRestorableTime": "2019-03-22T18:43:43.072Z", 
+            "PreferredBackupWindow": "10:45-11:15", 
+            "DBSubnetGroup": "auroratest-dbsubnetgroup-1ax48cm391s2y", 
+            "AllocatedStorage": 1, 
+            "BackupRetentionPeriod": 7, 
+            "PreferredMaintenanceWindow": "fri:06:01-fri:06:31", 
+            "Engine": "aurora", 
+            "Endpoint": "auroratest-dbcluster-1jzpu7c9593ol.cluster-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "AssociatedRoles": [], 
+            "EarliestRestorableTime": "2019-03-15T10:58:11.603Z", 
+            "IAMDatabaseAuthenticationEnabled": false, 
+            "ClusterCreateTime": "2017-09-21T20:36:14.474Z", 
+            "EngineVersion": "5.6.10a", 
+            "DBClusterIdentifier": "auroratest-dbcluster-1jzpu7c9593ol", 
+            "DbClusterResourceId": "cluster-RAEQBIRXHZMNRBJ76EPRH3FMTE", 
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": false, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 1, 
+                    "DBInstanceIdentifier": "ods01-instance1-lab"
+                }, 
+                {
+                    "IsClusterWriter": true, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 1, 
+                    "DBInstanceIdentifier": "ods01-instance2-lab"
+                }
+            ], 
+            "DBClusterArn": "arn:aws:rds:us-west-2:129801715103:cluster:auroratest-dbcluster-1jzpu7c9593ol", 
+            "StorageEncrypted": false, 
+            "DatabaseName": "ODS", 
+            "DBClusterParameterGroup": "auroratest-clusterparametergroup-55dk0xhgqrn3", 
+            "AvailabilityZones": [
+                "us-west-2c", 
+                "us-west-2a", 
+                "us-west-2b"
+            ], 
+            "Port": 3306
+        }, 
+        {
+            "MasterUsername": "PDBAAdmin", 
+            "ReaderEndpoint": "orderdirectory.cluster-ro-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "ReadReplicaIdentifiers": [], 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-5a575420"
+                }
+            ], 
+            "HostedZoneId": "Z1PVIF0B656C1W", 
+            "Status": "available", 
+            "MultiAZ": false, 
+            "LatestRestorableTime": "2019-03-22T18:41:57.122Z", 
+            "PreferredBackupWindow": "12:41-13:11", 
+            "DBSubnetGroup": "auroracf-dbsubnetgroup-44v2tz7sz830", 
+            "AllocatedStorage": 1, 
+            "BackupRetentionPeriod": 1, 
+            "PreferredMaintenanceWindow": "sat:05:00-sat:06:00", 
+            "Engine": "aurora", 
+            "Endpoint": "orderdirectory.cluster-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "AssociatedRoles": [], 
+            "EarliestRestorableTime": "2019-03-21T12:50:20.424Z", 
+            "IAMDatabaseAuthenticationEnabled": false, 
+            "ClusterCreateTime": "2017-09-05T20:46:31.967Z", 
+            "EngineVersion": "5.6.10a", 
+            "DBClusterIdentifier": "orderdirectory", 
+            "DbClusterResourceId": "cluster-AUCHJVBJYPMK3OHQOFXVPHTZEM", 
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": true, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 0, 
+                    "DBInstanceIdentifier": "orderdirectory4"
+                }
+            ], 
+            "DBClusterArn": "arn:aws:rds:us-west-2:129801715103:cluster:orderdirectory", 
+            "KmsKeyId": "arn:aws:kms:us-west-2:129801715103:key/032f30ab-8e53-48f3-b7bf-11c88cc18056", 
+            "StorageEncrypted": true, 
+            "DatabaseName": "OrderDirectory", 
+            "DBClusterParameterGroup": "aurora-test", 
+            "AvailabilityZones": [
+                "us-west-2c", 
+                "us-west-2a", 
+                "us-west-2b"
+            ], 
+            "Port": 3306
+        }, 
+        {
+            "MasterUsername": "root", 
+            "ReaderEndpoint": "perfschematest.cluster-ro-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "ReadReplicaIdentifiers": [], 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-60c09f07"
+                }, 
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-5a575420"
+                }
+            ], 
+            "HostedZoneId": "Z1PVIF0B656C1W", 
+            "Status": "available", 
+            "MultiAZ": false, 
+            "LatestRestorableTime": "2019-03-22T18:43:11.448Z", 
+            "PreferredBackupWindow": "13:14-13:44", 
+            "DBSubnetGroup": "auroracf-dbsubnetgroup-44v2tz7sz830", 
+            "AllocatedStorage": 1, 
+            "BackupRetentionPeriod": 1, 
+            "PreferredMaintenanceWindow": "thu:07:51-thu:08:21", 
+            "Engine": "aurora", 
+            "Endpoint": "perfschematest.cluster-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "AssociatedRoles": [], 
+            "EarliestRestorableTime": "2019-03-21T13:24:09.643Z", 
+            "IAMDatabaseAuthenticationEnabled": false, 
+            "ClusterCreateTime": "2019-01-23T22:13:57.458Z", 
+            "EngineVersion": "5.6.10a", 
+            "DBClusterIdentifier": "perfschematest", 
+            "DbClusterResourceId": "cluster-QA5G6DBR2CCX3SRUHPRWQLOVHA", 
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": true, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 1, 
+                    "DBInstanceIdentifier": "perfschematest"
+                }
+            ], 
+            "DBClusterArn": "arn:aws:rds:us-west-2:129801715103:cluster:perfschematest", 
+            "KmsKeyId": "arn:aws:kms:us-west-2:129801715103:key/032f30ab-8e53-48f3-b7bf-11c88cc18056", 
+            "StorageEncrypted": true, 
+            "DatabaseName": "perfschema", 
+            "DBClusterParameterGroup": "auroracf-dbclusterparametergroup-129ceyzu3m5ai", 
+            "AvailabilityZones": [
+                "us-west-2c", 
+                "us-west-2a", 
+                "us-west-2b"
+            ], 
+            "Port": 3306
+        }, 
+        {
+            "MasterUsername": "wwilkins", 
+            "ReaderEndpoint": "wade-serverless-test-cluster-1.cluster-ro-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "ReadReplicaIdentifiers": [], 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-eb09e694"
+                }
+            ], 
+            "HostedZoneId": "Z1PVIF0B656C1W", 
+            "Status": "available", 
+            "MultiAZ": false, 
+            "LatestRestorableTime": "2019-03-22T18:42:08.601Z", 
+            "PreferredBackupWindow": "07:32-08:02", 
+            "DBSubnetGroup": "default-vpc-5b1fbc22", 
+            "AllocatedStorage": 1, 
+            "BackupRetentionPeriod": 1, 
+            "PreferredMaintenanceWindow": "mon:06:25-mon:06:55", 
+            "Engine": "aurora-mysql", 
+            "Endpoint": "wade-serverless-test-cluster-1.cluster-czkg5cms1vxp.us-west-2.rds.amazonaws.com", 
+            "EarliestRestorableTime": "2019-03-21T07:38:15.248Z", 
+            "IAMDatabaseAuthenticationEnabled": false, 
+            "ClusterCreateTime": "2019-03-13T21:56:56.959Z", 
+            "EngineVersion": "5.7.mysql_aurora.2.03.4", 
+            "DBClusterIdentifier": "wade-serverless-test-cluster-1", 
+            "DbClusterResourceId": "cluster-P6XAU6POKGHSOLBZ6TFNQTIYVA", 
+            "DBClusterMembers": [
+                {
+                    "IsClusterWriter": true, 
+                    "DBClusterParameterGroupStatus": "in-sync", 
+                    "PromotionTier": 1, 
+                    "DBInstanceIdentifier": "wade-serverless-test"
+                }
+            ], 
+            "DBClusterArn": "arn:aws:rds:us-west-2:129801715103:cluster:wade-serverless-test-cluster-1", 
+            "KmsKeyId": "arn:aws:kms:us-west-2:129801715103:key/032f30ab-8e53-48f3-b7bf-11c88cc18056", 
+            "StorageEncrypted": true, 
+            "AssociatedRoles": [], 
+            "DBClusterParameterGroup": "default.aurora-mysql5.7", 
+            "AvailabilityZones": [
+                "us-west-2c", 
+                "us-west-2a", 
+                "us-west-2b"
+            ], 
+            "Port": 3306
+        }
+    ]
+}

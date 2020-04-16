@@ -1,0 +1,30 @@
+        {
+            "EvaluationPeriods": 1,
+            "AlarmArn": "arn:aws:cloudwatch:us-west-2:129801715103:alarm:PDBA_RDS_auroratest-dbcluster-1jzpu7c9593ol_SelectLatency",
+            "StateUpdatedTimestamp": "2019-03-21T19:17:50.337Z",
+            "AlarmConfigurationUpdatedTimestamp": "2019-03-21T19:17:50.337Z",
+            "ComparisonOperator": "GreaterThanThreshold",
+            "AlarmActions": [
+                "arn:aws:sns:us-west-2:129801715103:emf_cloudwatch"
+            ],
+            "AlarmDescription": "Alarm when CPU exceeds 70 percent",
+            "Namespace": "AWS/RDS",
+            "Period": 60,
+            "StateValue": "INSUFFICIENT_DATA",
+            "Threshold": 0.1,
+            "AlarmName": "PDBA_RDS_auroratest-dbcluster-1jzpu7c9593ol_SelectLatency",
+            "Dimensions": [
+                {
+                    "Name": "DBInstanceIdentifier",
+                    "Value": "auroratest-dbcluster-1jzpu7c9593ol"
+                }
+            ],
+            "Unit": "Milliseconds",
+            "Statistic": "Average",
+            "StateReason": "Unchecked: Initial alarm creation",
+            "InsufficientDataActions": [],
+            "OKActions": [],
+            "ActionsEnabled": true,
+            "MetricName": "SelectLatency"
+        },
+

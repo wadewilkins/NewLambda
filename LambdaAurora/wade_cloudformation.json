@@ -1,0 +1,882 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+"Description": "WADE Aurora DB Stack",
+"Parameters": {
+    "VpcId": {
+        "Description": "VPcId for the security group",
+        "Type": "String"
+    },
+    "DBUsername": {
+        "Description": "App Db Username",
+        "Type": "String",
+        "MinLength": "4",
+        "MaxLength": "15",
+        "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+        "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBPassword": {
+        "Description": "App Db Password",
+        "NoEcho": "true",
+        "Type": "String",
+        "MinLength": "5",
+        "MaxLength": "15",
+        "AllowedPattern": "[a-zA-Z0-9!@#$%^&]*",
+        "ConstraintDescription": "App Db Password must be 5-15 characters and contain only alpha numeric and these !@#$%^& special characters."
+    },
+    "DBType": {
+        "Description": "App Db server RDS instance type",
+        "Type": "String",
+        "Default": "db.r4.large",
+        "ConstraintDescription": "must be a valid RDS instance type EX- db.r4.2xlarge"
+    },
+    "DBIdentifierNameMaster": {
+        "Description": "The string that will be prefixed to each instance name",
+        "Type": "String",
+        "MinLength": "3",
+        "MaxLength": "30",
+        "AllowedPattern": "[a-zA-Z0-9_-]*",
+        "ConstraintDescription": "Identifier names must be 3-6 characters and contain only a-z and 0-9."
+    },
+    "DBIdentifierNameReplica": {
+        "Description": "The string that will be prefixed to each instance name",
+        "Type": "String",
+        "MinLength": "3",
+        "MaxLength": "30",
+        "AllowedPattern": "[a-zA-Z0-9_-]*",
+        "ConstraintDescription": "Identifier names must be 3-10 characters and contain only a-z and 0-9."
+    },
+    "vEngine": {
+        "Type": "String",
+        "Default": "5.7",
+        "AllowedValues": ["5.6","5.7"]
+    },
+    "Subnets": {
+        "Type": "CommaDelimitedList",
+        "Default": "subnet-8ec5b8e6,subnet-1edcc277",
+        "Description": "The list of SubnetIds where the stack will be launched"
+    },
+    "BackupRetentionDays":{
+    	"Type": "String",
+    	"Description": "Backup Retain Days for point in time restore",
+    	"AllowedValues": ["14","35"]
+    },
+    "DBSecurityGroup": {
+        "Type": "String",
+        "Description": "Security Group id"
+    },
+    "MonitoringInterval":{
+    	"Type": "String",
+    	"AllowedValues": [1, 5, 10, 15, 30, 60],
+    	"Description": "Monitoring interval in seconds"
+    },
+    "SelectLatency":{
+    	"Type": "String",
+    	"Description": "Monitoring interval in milliseconds"
+    },
+    "DMLlatency":{
+    	"Type": "String",
+    	"Description": "Monitoring interval in milliseconds"
+    },
+    "MinorVersionUpgrade":{
+    	"Type": "String",
+    	"AllowedValues": ["True","False"],
+    	"Description": "This can cause service interruption"
+    },
+    "WriterAZ": {
+    	"Type": "String",
+    	"Description": "Specify Writer AvailabilityZone"
+
+    },
+    "ReplicaLatency": {
+    	"Type": "String",
+    	"Description": "Specify Acceptable Replica Latency in Milliseconds"
+    },
+    "ReaderAZ": {
+    	"Type": "String",
+    	"Description": "Specify Reader AvailabilityZone"
+
+    },
+    "Tag1": {
+		"Description": "Tag-CostCenter",
+		"Type": "String"
+	},
+	"Tag2": {
+		"Description": "Tag-AssetProtectionLevel",
+		"Type": "String"
+	},
+	"Tag3": {
+		"Description": "Tag-Team",
+		"Type": "String"
+	},
+	"Tag4": {
+		"Description": "Tag-Application",
+		"Type": "String"
+	},
+	"Tag5": {
+		"Description": "Tag-Owner",
+		"Type": "String"
+	},
+	"Tag6": {
+		"Description": "Tag-Email",
+		"Type": "String"
+	},
+	"Tag7": {
+		"Description": "Tag-Brand",
+		"Type": "String"
+	},
+	"Tag8": {
+		"Description": "Tag-SupportedBy",
+		"Default": "Platform Database Services",
+		"Type": "String"
+	}
+
+},
+
+"Conditions": {
+    "version" : {
+      "Fn::Not" : [{
+        "Fn::Equals" : [
+          {"Ref" : "vEngine"},
+          "5.6"
+          ]
+      }]
+    }
+},
+"Resources": {
+    "DBSubnetGroup": {
+        "Type": "AWS::RDS::DBSubnetGroup",
+        "Properties": {
+            "DBSubnetGroupDescription": "DB subent groups",
+            "SubnetIds": 
+                {
+                    "Ref": "Subnets"
+                }
+        }
+    },
+    "DBCluster": {
+        "Type": "AWS::RDS::DBCluster",
+        "Properties": {
+            "Engine": { "Fn::If" : ["version","aurora-mysql", "aurora"]},
+            "MasterUsername": {
+                "Ref": "DBUsername"
+            },
+            "MasterUserPassword": {
+                "Ref": "DBPassword"
+            },
+            "PreferredBackupWindow": "06:00-07:00",
+            "PreferredMaintenanceWindow": "sun:08:00-sun:08:30",
+            "BackupRetentionPeriod": {"Ref": "BackupRetentionDays"},
+            "DBSubnetGroupName": {
+                "Ref": "DBSubnetGroup"
+            },
+            "VpcSecurityGroupIds": [
+                {
+                    "Ref": "DBSecurityGroup"
+                }
+            ],
+            "DBClusterParameterGroupName": {
+            	"Ref": "DBClusterParameterGroup"
+            },
+            "Tags": [{
+						"Key": "CostCenter",
+						"Value": {"Ref": "Tag1"}
+					},
+
+					{
+						"Key": "AssetProtectionLevel",
+						"Value": {"Ref": "Tag2"}
+					},
+					{
+						"Key": "Team",
+						"Value": {"Ref": "Tag3"}
+					},
+					{
+						"Key": "Application",
+						"Value": {"Ref": "Tag4"}
+					},
+					{
+						"Key": "Owner",
+						"Value": {"Ref": "Tag5"}
+					},
+					{
+						"Key": "Email",
+						"Value": {"Ref": "Tag6"}
+					},
+					{
+						"Key": "Brand",
+						"Value": {"Ref": "Tag7"}
+					},
+					{
+						"Key": "SupportedBy",
+						"Value": {"Ref": "Tag8"}
+					}
+				]
+        }
+    },
+    "PrimaryInstance": {
+        "Type": "AWS::RDS::DBInstance",
+        "Properties": {
+            "DBClusterIdentifier": {
+                "Ref": "DBCluster"
+            },
+            "DBInstanceIdentifier": {
+                "Ref": "DBIdentifierNameMaster"
+            },
+            "DBInstanceClass": {
+                "Ref": "DBType"
+            },
+            "Engine":  { "Fn::If" : ["version","aurora-mysql", "aurora"]},
+            "DBParameterGroupName": {
+                "Ref": "DbParameterGroup"
+            },
+            "DBSubnetGroupName": {
+                "Ref": "DBSubnetGroup"
+            },
+            "AvailabilityZone": {"Ref": "WriterAZ"},
+            "MonitoringInterval": {"Ref": "MonitoringInterval"},
+            "MonitoringRoleArn": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:iam::",
+                                {
+                                    "Ref": "AWS::AccountId"
+                                },
+                                ":role/rds-monitoring-role"
+                            ]
+                        ]
+                    },
+            "AllowMajorVersionUpgrade": "false",
+            "AutoMinorVersionUpgrade": {"Ref": "MinorVersionUpgrade"},
+            "PubliclyAccessible": "false",
+            "Tags": [{
+						"Key": "CostCenter",
+						"Value": {"Ref": "Tag1"}
+					},
+
+					{
+						"Key": "AssetProtectionLevel",
+						"Value": {"Ref": "Tag2"}
+					},
+					{
+						"Key": "Team",
+						"Value": {"Ref": "Tag3"}
+					},
+					{
+						"Key": "Application",
+						"Value": {"Ref": "Tag4"}
+					},
+					{
+						"Key": "Owner",
+						"Value": {"Ref": "Tag5"}
+					},
+					{
+						"Key": "Email",
+						"Value": {"Ref": "Tag6"}
+					},
+					{
+						"Key": "Brand",
+						"Value": {"Ref": "Tag7"}
+					},
+					{
+						"Key": "SupportedBy",
+						"Value": {"Ref": "Tag8"}
+					}
+				]
+        }
+    },
+    "ReplicaInstance": {
+        "Type": "AWS::RDS::DBInstance",
+        "Properties": {
+            "DBClusterIdentifier": {
+                "Ref": "DBCluster"
+            },
+            "DBInstanceIdentifier": {
+                "Ref": "DBIdentifierNameReplica"
+            },
+            "DBInstanceClass": {
+                "Ref": "DBType"
+            },
+            "Engine":  { "Fn::If" : ["version","aurora-mysql", "aurora"]},
+            "DBParameterGroupName": {
+                "Ref": "DbParameterGroup"
+            },
+            "DBSubnetGroupName": {
+                "Ref": "DBSubnetGroup"
+            },
+            "MonitoringInterval": {"Ref": "MonitoringInterval"},
+            "AvailabilityZone": {"Ref": "ReaderAZ"},
+            "MonitoringRoleArn": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:iam::",
+                                {
+                                    "Ref": "AWS::AccountId"
+                                },
+                                ":role/rds-monitoring-role"
+                            ]
+                        ]
+                    },
+            "AllowMajorVersionUpgrade": "false",
+            "AutoMinorVersionUpgrade": {"Ref": "MinorVersionUpgrade"}, 
+            "PubliclyAccessible": "false",
+            "Tags": [{
+						"Key": "CostCenter",
+						"Value": {"Ref": "Tag1"}
+					},
+
+					{
+						"Key": "AssetProtectionLevel",
+						"Value": {"Ref": "Tag2"}
+					},
+					{
+						"Key": "Team",
+						"Value": {"Ref": "Tag3"}
+					},
+					{
+						"Key": "Application",
+						"Value": {"Ref": "Tag4"}
+					},
+					{
+						"Key": "Owner",
+						"Value": {"Ref": "Tag5"}
+					},
+					{
+						"Key": "Email",
+						"Value": {"Ref": "Tag6"}
+					},
+					{
+						"Key": "Brand",
+						"Value": {"Ref": "Tag7"}
+					},
+					{
+						"Key": "SupportedBy",
+						"Value": {"Ref": "Tag8"}
+					}
+				]
+        }
+    },
+    "DbParameterGroup": {
+        "Type": "AWS::RDS::DBParameterGroup",
+        "Properties": {
+            "Description": "AppDbParameters",
+            "Family": { "Fn::If" : ["version","aurora-mysql5.7", "aurora5.6"]},
+            "Parameters": {
+                "log_bin_trust_function_creators": "on",
+                "explicit_defaults_for_timestamp": "0",
+                "tx_isolation": "READ-COMMITTED"
+            }
+        }
+    },
+    "DBClusterParameterGroup": {
+    	"Type" : "AWS::RDS::DBClusterParameterGroup",
+  		"Properties" : {
+    		"Description" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "ClusterGroup-",
+                                {
+                                    "Ref": "DBIdentifierNameMaster"
+                                }
+                            ]
+                        ]
+                    },
+    		"Family" : { "Fn::If" : ["version","aurora-mysql5.7", "aurora5.6"]},
+    		"Parameters": {
+    			"server_audit_logging": "off"
+    		}
+    	}
+
+    },
+    "CWFreeableMemory": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora reader or writer freeable memory is under 700MB",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_freeablememory_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "LessThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}} ],
+      	"EvaluationPeriods" : "2",
+      	"MetricName" : "FreeableMemory",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : 700000000,
+      	"Unit" : "Bytes"
+      }
+   },
+   "CWCPUUtilization": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora-CPU utilization is more than 85%",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_cpu_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}} ],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "CPUUtilization",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : 85,
+      	"Unit" : "Percent"
+      }
+   },
+   "CWBlockedTransactions": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora-BlockedTransactions is greater than 5",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_blockedtransactions_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "BlockedTransactions",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"TreatMissingData": "notBreaching",
+      	"Threshold" : 5,
+      	"Unit" : "Count"
+      }
+   },
+   "CWDeadlocks": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora-Deadlocks is greater than 5",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_deadlocks_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}} ],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "Deadlocks",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"TreatMissingData": "notBreaching",
+      	"Threshold" : 5,
+      	"Unit" : "Count"
+      }
+   },
+   "CWDatabaseConnections": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora DatabaseConnections are greater than 500",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_dbconnections_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "DatabaseConnections",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : 500,
+      	"Unit" : "Count"
+      }
+   },
+   "CWSelectLatency": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora SelectLatency is greater than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_selectlatency_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "SelectLatency",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : {"Ref": "SelectLatency"},
+      	"Unit" : "Milliseconds"
+      }
+   },
+   "CWDMLLatency": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora DMLLatency is greater than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_dmllatency_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "DMLLatency",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : {"Ref": "DMLlatency"},
+      	"Unit" : "Milliseconds"
+      }
+   },
+   "CWUpTime": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora UpTime is less than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_uptime_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "LessThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "EngineUptime",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "60",
+      	"Statistic" : "Average",
+      	"Threshold" : 60,
+      	"Unit" : "Seconds"
+      }
+   },   
+   "CWReplicaLag": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora DMLLatency is greater than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_AuroraReplicaLag_",
+                                {
+                                    "Ref": "PrimaryInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "PrimaryInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "AuroraReplicaLag",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : {"Ref": "ReplicaLatency"},
+      	"Unit" : "Milliseconds"
+      }
+   },
+   "CWROCPUUtilization": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora-CPU utilization is more than 85%",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_cpu_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}} ],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "CPUUtilization",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : 85,
+      	"Unit" : "Percent"
+      }
+   },   
+   "CWRODatabaseConnections": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora DatabaseConnections are greater than 500",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_dbconnections_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "DatabaseConnections",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : 500,
+      	"Unit" : "Count"
+      }
+   },"CWROFreeableMemory": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora database freeable memory is under 700MB",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_freeablememory_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "LessThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}} ],
+      	"EvaluationPeriods" : "2",
+      	"MetricName" : "FreeableMemory",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : 700000000,
+      	"Unit" : "Bytes"
+      }
+   },
+   "CWROBlockedTransactions": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora-BlockedTransactions is greater than 5",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_blockedtransactions_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "BlockedTransactions",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"TreatMissingData": "notBreaching",
+      	"Threshold" : 5,
+      	"Unit" : "Count"
+      }
+   },
+   "CWRODeadlocks": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora-Deadlocks is greater than 5",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_deadlocks_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}} ],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "Deadlocks",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"TreatMissingData": "notBreaching",
+      	"Threshold" : 5,
+      	"Unit" : "Count"
+      }
+   },
+   "CWROSelectLatency": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora SelectLatency is greater than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_selectlatency_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "SelectLatency",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : {"Ref": "SelectLatency"},
+      	"Unit" : "Milliseconds"
+      }
+   },
+   "CWRODMLLatency": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora DMLLatency is greater than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_dmllatency_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "DMLLatency",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : {"Ref": "DMLlatency"},
+      	"Unit" : "Milliseconds"
+      }
+   },
+   "CWROUpTime": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora UpTime is less than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_uptime_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "LessThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "EngineUptime",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "60",
+      	"Statistic" : "Average",
+      	"Threshold" : 60,
+      	"Unit" : "Seconds"
+      }
+   },   
+   "CWROReplicaLag": {
+   		"Type" : "AWS::CloudWatch::Alarm",
+   		"Properties" : {
+      	"AlarmDescription" : "Aurora DMLLatency is greater than threshold",
+      	"AlarmName" : {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "pdba_AuroraReplicaLag_",
+                                {
+                                    "Ref": "ReplicaInstance"
+                                }
+                            ]
+                        ]
+                    },
+      	"ComparisonOperator" : "GreaterThanOrEqualToThreshold",
+      	"Dimensions" : [ {"Name": "DBInstanceIdentifier", "Value": {"Ref": "ReplicaInstance"}}],
+      	"EvaluationPeriods" : "1",
+      	"MetricName" : "AuroraReplicaLag",
+      	"Namespace" : "AWS/RDS",
+      	"Period" : "300",
+      	"Statistic" : "Average",
+      	"Threshold" : {"Ref": "ReplicaLatency"},
+      	"Unit" : "Milliseconds"
+      }
+   },
+   "AMIIDLookup": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+           "Handler": "emf_cloudwatch_rds.lambda_handler",
+           "Role": { "Fn::GetAtt" : ["LambdaExecutionRole", "Arn"] },
+           "Code": {
+             "S3Bucket": "wade1",
+             "S3Key": "emf_cloudwatch_rds.zip"
+           },
+           "Runtime": "python",
+           "Timeout": 25,
+           "TracingConfig": {
+             "Mode": "Active"
+           }
+        }
+    }
+}
+}
+
